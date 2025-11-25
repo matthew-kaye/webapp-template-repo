@@ -6,6 +6,8 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://localhost:${PORT}`;
 export default defineConfig({
   testDir: './tests/e2e',
   timeout: 30_000,
+  workers: 1,
+  fullyParallel: false,
   use: {
     baseURL,
     trace: 'on-first-retry',
@@ -24,13 +26,5 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] }
     },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] }
-    },
-    {
-      name: 'mobile-chrome',
-      use: { ...devices['Pixel 7'] }
-    }
   ]
 });

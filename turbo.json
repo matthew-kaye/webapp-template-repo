@@ -1,0 +1,46 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["//#start:docker-compose"]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "format": {
+      "outputs": []
+    },
+    "//#install-deps": {
+      "cache": false,
+      "outputs": ["node_modules/**", "package-lock.json"]
+    },
+    "//#install": {
+      "dependsOn": ["//#install-deps"],
+      "cache": false
+    },
+    "//#start:docker-compose": {
+      "cache": false,
+      "outputLogs": "new-only"
+    },
+    "test:unit": {
+      "outputs": []
+    },
+    "test:functional": {
+      "outputs": [],
+      "dependsOn": ["//#start:docker-compose"]
+    },
+    "test:e2e": {
+      "outputs": []
+    },
+    "pre-push-checks": {
+      "outputs": [],
+      "dependsOn": ["lint", "test:unit"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**"]
+    }
+  }
+}

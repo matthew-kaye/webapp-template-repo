@@ -1,0 +1,51 @@
+{
+  "name": "webapp-template-repo",
+  "version": "1.0.0",
+  "description": "Next.js + NestJS turborepo starter with MySQL + TypeORM",
+  "private": true,
+  "packageManager": "npm@11.6.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "format": "turbo format",
+    "test:unit": "turbo test:unit",
+    "test:functional": "turbo test:functional",
+    "test:e2e": "turbo test:e2e",
+    "pre-push-checks": "turbo run lint test:unit",
+    "install-deps": "npm install",
+    "start:docker-compose": "docker-compose up -d --wait"
+  },
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matthew-kaye/webapp-template-repo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/matthew-kaye/webapp-template-repo/issues"
+  },
+  "homepage": "https://github.com/matthew-kaye/webapp-template-repo#readme",
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.6.2",
+    "ts-node": "^10.9.2",
+    "turbo": "^2.6.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@types/jest": "^30.0.0"
+  }
+}

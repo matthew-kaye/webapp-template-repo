@@ -21,9 +21,7 @@ test.describe('Delete Bookmarks', () => {
     expect(titles).toContain('Bookmark to Delete');
     expect(titles).toContain('Bookmark to Keep');
 
-    await bookmarkPage.deleteFirstBookmark();
-    await page.waitForTimeout(1000);
-    await bookmarkPage.waitForBookmarkToAppear('Bookmark to Keep');
+    await bookmarkPage.deleteBookmarkWithTitle('Bookmark to Delete');
 
     titles = await bookmarkPage.getBookmarkTitles();
     expect(titles).not.toContain('Bookmark to Delete');

@@ -51,7 +51,6 @@ test.describe('List Bookmarks', () => {
     await bookmarkPage.waitForBookmarkToAppear('Design Resources');
 
     await bookmarkPage.filterByTag('web');
-    await page.waitForTimeout(1000);
     await bookmarkPage.waitForBookmarkToAppear('Web Development');
 
     const titles = await bookmarkPage.getBookmarkTitles();
@@ -84,7 +83,6 @@ test.describe('List Bookmarks', () => {
     await bookmarkPage.waitForBookmarkToAppear('Vue Guide');
 
     await bookmarkPage.search('React');
-    await page.waitForTimeout(1000);
     await bookmarkPage.waitForBookmarkToAppear('React Documentation');
 
     let titles = await bookmarkPage.getBookmarkTitles();
@@ -92,7 +90,6 @@ test.describe('List Bookmarks', () => {
     expect(titles).not.toContain('Vue Guide');
 
     await bookmarkPage.search('vuejs');
-    await page.waitForTimeout(1000);
     await bookmarkPage.waitForBookmarkToAppear('Vue Guide');
 
     titles = await bookmarkPage.getBookmarkTitles();

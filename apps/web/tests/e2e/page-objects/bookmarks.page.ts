@@ -45,11 +45,7 @@ export class BookmarksPage {
     await this.submitButton.click();
   }
 
-  async createBookmark(bookmark: {
-    title: string;
-    url?: string;
-    tags?: string;
-  }) {
+  async createBookmark(bookmark: { title: string; url?: string; tags?: string }) {
     await this.fillTitle(bookmark.title);
     await this.fillUrl(bookmark.url || 'https://example.com');
     await this.fillTags(bookmark.tags || 'test');
@@ -67,7 +63,9 @@ export class BookmarksPage {
   }
 
   async getBookmarkTitles(): Promise<string[]> {
-    await this.page.waitForSelector('[data-testid^="bookmark-item-"]', { timeout: 5000 }).catch(() => {});
+    await this.page
+      .waitForSelector('[data-testid^="bookmark-item-"]', { timeout: 5000 })
+      .catch(() => {});
     const items = await this.page.locator('[data-testid^="bookmark-item-"]').all();
     const titles: string[] = [];
     for (const item of items) {
@@ -78,16 +76,18 @@ export class BookmarksPage {
   }
 
   async waitForBookmarkToAppear(title: string, timeout = 10000): Promise<void> {
-    await this.page.waitForSelector(
-      `[data-testid^="bookmark-title-"]:has-text("${title}")`,
-      { timeout }
-    );
+    await this.page.waitForSelector(`[data-testid^="bookmark-title-"]:has-text("${title}")`, {
+      timeout,
+    });
   }
 
-  async deleteFirstBookmark(): Promise<void> {
-    const deleteButton = this.page.locator('[data-testid^="bookmark-delete-"]').first();
+  async deleteBookmarkWithTitle(title: string): Promise<void> {
+    const bookmarkItem = this.page.locator(
+      `[data-testid^="bookmark-item-"]:has([data-testid^="bookmark-title-"]:has-text("${title}"))`,
+    );
+    const deleteButton = bookmarkItem.locator('[data-testid^="bookmark-delete-"]');
     await expect(deleteButton).toBeVisible();
     await deleteButton.click();
+    await expect(bookmarkItem).not.toBeVisible();
   }
 }
-

@@ -6,7 +6,7 @@ import {
   waitForFunctionalTestContext
 } from './context';
 
-describe('POST /bookmarks/create (functional)', () => {
+describe('Bookmarks API (functional)', () => {
   let dataSource: DataSource;
   const baseUrl = () => getFunctionalTestContext().baseUrl;
 
@@ -47,6 +47,91 @@ describe('POST /bookmarks/create (functional)', () => {
       created_at: expect.any(String),
     });
     expect(new Date(response.body.created_at)).toBeInstanceOf(Date);
+  });
+
+  describe('GET /bookmarks', () => {
+    it('returns list of bookmarks', async () => {
+      // Create test bookmarks
+      const repo = dataSource.getRepository(BookmarkEntity);
+      await repo.save([
+        {
+          title: 'Example Bookmark 1',
+          url: 'https://example.com/1',
+          tags: 'web,development'
+        },
+        {
+          title: 'Example Bookmark 2',
+          url: 'https://example.com/2',
+          tags: 'design,resources'
+        }
+      ]);
+
+      const response = await request(baseUrl())
+        .get('/bookmarks')
+        .expect(200);
+
+      expect(response.body).toHaveLength(2);
+      expect(response.body[0]).toMatchObject({
+        title: expect.any(String),
+        url: expect.any(String),
+        tags: expect.any(String)
+      });
+    });
+
+    it('filters bookmarks by tag', async () => {
+      const repo = dataSource.getRepository(BookmarkEntity);
+      await repo.save([
+        {
+          title: 'Web Development',
+          url: 'https://web.dev',
+          tags: 'web,development'
+        },
+        {
+          title: 'Design Resources',
+          url: 'https://design.com',
+          tags: 'design,resources'
+        }
+      ]);
+
+      const response = await request(baseUrl())
+        .get('/bookmarks?tag=web')
+        .expect(200);
+
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0].title).toBe('Web Development');
+    });
+
+    it('searches bookmarks by title and URL', async () => {
+      const repo = dataSource.getRepository(BookmarkEntity);
+      await repo.save([
+        {
+          title: 'React Documentation',
+          url: 'https://react.dev',
+          tags: 'web,react'
+        },
+        {
+          title: 'Vue Guide',
+          url: 'https://vuejs.org',
+          tags: 'web,vue'
+        }
+      ]);
+
+      // Search by title
+      let response = await request(baseUrl())
+        .get('/bookmarks?q=React')
+        .expect(200);
+
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0].title).toBe('React Documentation');
+
+      // Search by URL
+      response = await request(baseUrl())
+        .get('/bookmarks?q=vuejs')
+        .expect(200);
+
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0].title).toBe('Vue Guide');
+    });
   });
 });
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { BookmarksService } from '../../application/bookmarks.service';
 import { Bookmark } from '../../domain/bookmark';
 
@@ -19,6 +19,14 @@ export class BookmarksController {
       tags: bookmark.tags,
       created_at: bookmark.created_at
     };
+  }
+
+  @Get()
+  async listBookmarks(
+    @Query('tag') tag?: string,
+    @Query('q') query?: string
+  ): Promise<Bookmark[]> {
+    return this.bookmarksService.listBookmarks(tag, query);
   }
 }
 

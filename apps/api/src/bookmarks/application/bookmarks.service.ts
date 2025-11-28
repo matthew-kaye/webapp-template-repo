@@ -12,5 +12,9 @@ export class BookmarksService {
   async createBookmark(bookmark: Omit<Bookmark, 'id' | 'created_at'>): Promise<Bookmark> {
     return this.bookmarksRepository.create(bookmark);
   }
+
+  async listBookmarks(tag?: string, query?: string): Promise<Bookmark[]> {
+    return this.bookmarksRepository.list(tag, query);
+  }
 }
 

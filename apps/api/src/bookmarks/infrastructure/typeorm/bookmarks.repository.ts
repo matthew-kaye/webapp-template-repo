@@ -26,6 +26,38 @@ export class BookmarksRepository implements BookmarksRepositoryPort {
       created_at: saved.created_at
     };
   }
+
+  async list(tag?: string, query?: string): Promise<Bookmark[]> {
+    const queryBuilder = this.repository.createQueryBuilder('bookmark');
+
+    if (tag) {
+      queryBuilder.where('bookmark.tags LIKE :tag', { tag: `%${tag}%` });
+    }
+
+    if (query) {
+      if (tag) {
+        queryBuilder.andWhere(
+          `(bookmark.title LIKE :query OR bookmark.url LIKE :query)`,
+          { query: `%${query}%` }
+        );
+      } else {
+        queryBuilder.where(
+          `(bookmark.title LIKE :query OR bookmark.url LIKE :query)`,
+          { query: `%${query}%` }
+        );
+      }
+    }
+
+    const entities = await queryBuilder.getMany();
+
+    return entities.map(entity => ({
+      id: entity.id,
+      title: entity.title,
+      url: entity.url,
+      tags: entity.tags,
+      created_at: entity.created_at
+    }));
+  }
 }
 
 export const BookmarksRepositoryProvider = {

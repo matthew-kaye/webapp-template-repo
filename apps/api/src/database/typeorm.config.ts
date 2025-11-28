@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { UserEntity } from '../users/infrastructure/typeorm/user.entity';
+import { BookmarkEntity } from '../bookmarks/infrastructure/typeorm/bookmark.entity';
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -18,7 +19,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       return {
         type,
         database: this.configService.get<string>('DATABASE_DATABASE', ':memory:'),
-        entities: [UserEntity],
+        entities: [UserEntity, BookmarkEntity],
         synchronize,
         logging: false,
       };
@@ -31,7 +32,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       username: this.configService.get<string>('DATABASE_USER', 'webapp'),
       password: this.configService.get<string>('DATABASE_PASSWORD', 'webapp'),
       database: this.configService.get<string>('DATABASE_NAME', 'webapp'),
-      entities: [UserEntity],
+      entities: [UserEntity, BookmarkEntity],
       synchronize,
       logging: false,
     };

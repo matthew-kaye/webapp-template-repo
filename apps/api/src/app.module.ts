@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfigService } from './database/typeorm.config';
 import { UsersModule } from './users/users.module';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
 
 @Module({
   imports: [
@@ -12,7 +13,8 @@ import { UsersModule } from './users/users.module';
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService
     }),
-    UsersModule
+    UsersModule,
+    BookmarksModule
   ],
   providers: [TypeOrmConfigService]
 })

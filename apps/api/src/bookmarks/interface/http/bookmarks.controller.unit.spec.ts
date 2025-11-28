@@ -105,5 +105,29 @@ describe('BookmarksController', () => {
       expect(service.listBookmarks).toHaveBeenCalledWith(undefined, 'React');
     });
   });
+
+  describe('delete', () => {
+    it('deletes a bookmark', async () => {
+      const service = mock<BookmarksService>();
+      service.deleteBookmark.mockResolvedValue(undefined);
+      const controller = new BookmarksController(service);
+
+      await controller.deleteBookmark('bookmark-1');
+
+      expect(service.deleteBookmark).toHaveBeenCalledWith('bookmark-1');
+    });
+  });
+
+  describe('deleteAll', () => {
+    it('deletes all bookmarks', async () => {
+      const service = mock<BookmarksService>();
+      service.deleteAllBookmarks.mockResolvedValue(undefined);
+      const controller = new BookmarksController(service);
+
+      await controller.deleteAllBookmarks();
+
+      expect(service.deleteAllBookmarks).toHaveBeenCalled();
+    });
+  });
 });
 

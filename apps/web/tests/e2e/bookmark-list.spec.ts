@@ -1,102 +1,101 @@
 import { test, expect } from '@playwright/test';
-import { BookmarkCreatePage } from './page-objects/bookmark-create.page';
-import { BookmarkListPage } from './page-objects/bookmark-list.page';
+import { BookmarksPage } from './page-objects/bookmarks.page';
 
 test.describe('List Bookmarks', () => {
+  test.beforeEach(async ({ page }) => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    await page.request.delete(`${apiUrl}/bookmarks`);
+  });
+
   test('should display list of bookmarks', async ({ page }) => {
-    const createPage = new BookmarkCreatePage(page);
-    const listPage = new BookmarkListPage(page);
+    const bookmarkPage = new BookmarksPage(page);
 
-    await listPage.goto();
+    await bookmarkPage.goto();
 
-    // Create a bookmark first
-    await createPage.createBookmark({
+    await bookmarkPage.createBookmark({
       title: 'Example Bookmark',
-      url: 'https://example.com',
       tags: 'web,development'
     });
 
-    await expect(createPage.successMessage).toBeVisible();
+    await expect(bookmarkPage.successMessage).toBeVisible();
 
-    // Wait for bookmark to appear in list
-    await listPage.waitForBookmarkToAppear('Example Bookmark');
-    await expect(listPage.bookmarkList).toBeVisible();
+    await bookmarkPage.waitForBookmarkToAppear('Example Bookmark');
+    await expect(bookmarkPage.bookmarkList).toBeVisible();
     
-    const titles = await listPage.getBookmarkTitles();
+    const titles = await bookmarkPage.getBookmarkTitles();
     expect(titles).toContain('Example Bookmark');
   });
 
   test('should filter bookmarks by tag', async ({ page }) => {
-    const createPage = new BookmarkCreatePage(page);
-    const listPage = new BookmarkListPage(page);
+    const bookmarkPage = new BookmarksPage(page);
 
-    await listPage.goto();
+    await bookmarkPage.goto();
 
-    // Create bookmarks with different tags
-    await createPage.createBookmark({
+    await bookmarkPage.createBookmark({
       title: 'Web Development',
       url: 'https://web.dev',
       tags: 'web,development'
     });
 
-    await createPage.createBookmark({
+    await expect(bookmarkPage.successMessage).toBeVisible();
+
+    await bookmarkPage.createBookmark({
       title: 'Design Resources',
       url: 'https://design.com',
       tags: 'design,resources'
     });
 
-    // Wait for both bookmarks to appear
-    await listPage.waitForBookmarkToAppear('Web Development');
-    await listPage.waitForBookmarkToAppear('Design Resources');
+    await expect(bookmarkPage.successMessage).toBeVisible();
 
-    // Filter by tag
-    await listPage.filterByTag('web');
+    await bookmarkPage.waitForBookmarkToAppear('Web Development');
+    await bookmarkPage.waitForBookmarkToAppear('Design Resources');
 
-    // Wait for filtered results
-    await page.waitForTimeout(500);
+    await bookmarkPage.filterByTag('web');
+    await page.waitForTimeout(1000);
+    await bookmarkPage.waitForBookmarkToAppear('Web Development');
 
-    // Should only show web bookmarks
-    const titles = await listPage.getBookmarkTitles();
+    const titles = await bookmarkPage.getBookmarkTitles();
     expect(titles).toContain('Web Development');
     expect(titles).not.toContain('Design Resources');
   });
 
   test('should search bookmarks by title and URL', async ({ page }) => {
-    const createPage = new BookmarkCreatePage(page);
-    const listPage = new BookmarkListPage(page);
+    const bookmarkPage = new BookmarksPage(page);
 
-    await listPage.goto();
+    await bookmarkPage.goto();
 
-    // Create bookmarks
-    await createPage.createBookmark({
+    await bookmarkPage.createBookmark({
       title: 'React Documentation',
       url: 'https://react.dev',
       tags: 'web,react'
     });
 
-    await createPage.createBookmark({
+    await expect(bookmarkPage.successMessage).toBeVisible();
+
+    await bookmarkPage.createBookmark({
       title: 'Vue Guide',
       url: 'https://vuejs.org',
       tags: 'web,vue'
     });
 
-    // Wait for both bookmarks to appear
-    await listPage.waitForBookmarkToAppear('React Documentation');
-    await listPage.waitForBookmarkToAppear('Vue Guide');
+    await expect(bookmarkPage.successMessage).toBeVisible();
 
-    // Search by title
-    await listPage.search('React');
-    await page.waitForTimeout(500);
+    await bookmarkPage.waitForBookmarkToAppear('React Documentation');
+    await bookmarkPage.waitForBookmarkToAppear('Vue Guide');
 
-    let titles = await listPage.getBookmarkTitles();
+    await bookmarkPage.search('React');
+    await page.waitForTimeout(1000);
+    await bookmarkPage.waitForBookmarkToAppear('React Documentation');
+
+    let titles = await bookmarkPage.getBookmarkTitles();
     expect(titles).toContain('React Documentation');
     expect(titles).not.toContain('Vue Guide');
 
-    // Search by URL
-    await listPage.search('vuejs');
-    await page.waitForTimeout(500);
+    await bookmarkPage.search('vuejs');
+    await page.waitForTimeout(1000);
+    await bookmarkPage.waitForBookmarkToAppear('Vue Guide');
 
-    titles = await listPage.getBookmarkTitles();
+    titles = await bookmarkPage.getBookmarkTitles();
     expect(titles).toContain('Vue Guide');
     expect(titles).not.toContain('React Documentation');
   });

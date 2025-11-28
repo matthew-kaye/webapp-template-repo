@@ -159,5 +159,44 @@ describe('BookmarksRepository', () => {
       expect(bookmarks[0].title).toBe('React Documentation');
     });
   });
+
+  describe('delete', () => {
+    it('deletes a bookmark by id', async () => {
+      const repo = dataSource.getRepository(BookmarkEntity);
+      const saved = await repo.save({
+        title: 'Example Bookmark',
+        url: 'https://example.com',
+        tags: 'web,development'
+      });
+
+      await repository.delete(saved.id);
+
+      const found = await repo.findOne({ where: { id: saved.id } });
+      expect(found).toBeNull();
+    });
+  });
+
+  describe('deleteAll', () => {
+    it('deletes all bookmarks', async () => {
+      const repo = dataSource.getRepository(BookmarkEntity);
+      await repo.save([
+        {
+          title: 'Bookmark 1',
+          url: 'https://example.com/1',
+          tags: 'web'
+        },
+        {
+          title: 'Bookmark 2',
+          url: 'https://example.com/2',
+          tags: 'design'
+        }
+      ]);
+
+      await repository.deleteAll();
+
+      const count = await repo.count();
+      expect(count).toBe(0);
+    });
+  });
 });
 

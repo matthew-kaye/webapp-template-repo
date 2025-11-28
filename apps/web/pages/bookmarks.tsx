@@ -65,13 +65,10 @@ export default function Bookmarks() {
       }
 
       setShowSuccess(true);
-      // Reset form
       setTitle('');
       setUrl('');
       setTags('');
-      // Hide success message after 3 seconds
       setTimeout(() => setShowSuccess(false), 3000);
-      // Refresh bookmarks list
       await fetchBookmarks();
     } catch {
       setShowError(true);
@@ -88,6 +85,20 @@ export default function Bookmarks() {
 
   const handleFilterKeyDown = () => {
     fetchBookmarks();
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch(`${apiUrl}/bookmarks/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        await fetchBookmarks();
+      }
+    } catch (error) {
+      console.error('Failed to delete bookmark:', error);
+    }
   };
 
   return (
@@ -113,7 +124,7 @@ export default function Bookmarks() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginTop: '2rem' }}>
             <div>
-              <h2 style={{ marginBottom: '1.5rem' }}>Create Bookmark</h2>
+              <h2 style={{ marginBottom: '1.5rem', marginTop: 0 }}>Create Bookmark</h2>
               <form onSubmit={handleSubmit}>
                 <div style={{ marginBottom: '1rem' }}>
                   <label htmlFor="title" style={{ display: 'block', marginBottom: '0.5rem' }}>
@@ -201,6 +212,7 @@ export default function Bookmarks() {
                 onTagFilterChange={handleTagFilterChange}
                 onSearchChange={handleSearchChange}
                 onFilterKeyDown={handleFilterKeyDown}
+                onDelete={handleDelete}
               />
             </div>
           </div>

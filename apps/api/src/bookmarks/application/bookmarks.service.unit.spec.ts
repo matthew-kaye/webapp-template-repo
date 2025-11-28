@@ -99,5 +99,17 @@ describe('BookmarksService', () => {
       expect(repository.list).toHaveBeenCalledWith(undefined, 'React');
     });
   });
+
+  describe('delete', () => {
+    it('deletes a bookmark using the repository', async () => {
+      const repository = mock<BookmarksRepositoryPort>();
+      repository.delete.mockResolvedValue(undefined);
+      const service = new BookmarksService(repository);
+
+      await service.deleteBookmark('bookmark-1');
+
+      expect(repository.delete).toHaveBeenCalledWith('bookmark-1');
+    });
+  });
 });
 

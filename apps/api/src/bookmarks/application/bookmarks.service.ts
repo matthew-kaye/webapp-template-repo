@@ -16,5 +16,13 @@ export class BookmarksService {
   async listBookmarks(tag?: string, query?: string): Promise<Bookmark[]> {
     return this.bookmarksRepository.list(tag, query);
   }
+
+  async deleteBookmark(id: string): Promise<void> {
+    return this.bookmarksRepository.delete(id);
+  }
+
+  async deleteAllBookmarks(): Promise<void> {
+    return this.bookmarksRepository.deleteAll();
+  }
 }
 

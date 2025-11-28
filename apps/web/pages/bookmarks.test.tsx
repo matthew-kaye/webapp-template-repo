@@ -255,6 +255,66 @@ describe('Bookmarks page', () => {
         expect(screen.queryByTestId('bookmark-item-2')).not.toBeInTheDocument();
       });
     });
+
+    it('deletes a bookmark when delete button is clicked', async () => {
+      const user = userEvent.setup();
+      const bookmarks = [
+        {
+          id: '1',
+          title: 'Bookmark 1',
+          url: 'https://example.com/1',
+          tags: 'web',
+          created_at: '2024-01-15T10:30:00Z'
+        },
+        {
+          id: '2',
+          title: 'Bookmark 2',
+          url: 'https://example.com/2',
+          tags: 'design',
+          created_at: '2024-01-16T10:30:00Z'
+        }
+      ];
+
+      const remainingBookmarks = [bookmarks[1]];
+
+      (global.fetch as jest.Mock)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => bookmarks
+        })
+        .mockResolvedValueOnce({
+          ok: true
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => remainingBookmarks
+        });
+
+      render(<Bookmarks />);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('bookmark-list')).toBeInTheDocument();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('bookmark-item-1')).toBeInTheDocument();
+      });
+
+      const deleteButton = screen.getByTestId('bookmark-delete-1');
+      await user.click(deleteButton);
+
+      await waitFor(() => {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        expect(global.fetch).toHaveBeenCalledWith(`${apiUrl}/bookmarks/1`, {
+          method: 'DELETE'
+        });
+      });
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('bookmark-item-1')).not.toBeInTheDocument();
+        expect(screen.getByTestId('bookmark-item-2')).toBeInTheDocument();
+      });
+    });
   });
 });
 

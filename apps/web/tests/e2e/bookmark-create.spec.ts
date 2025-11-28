@@ -1,19 +1,21 @@
 import { test, expect } from '@playwright/test';
-import { BookmarkCreatePage } from './page-objects/bookmark-create.page';
+import { BookmarksPage } from './page-objects/bookmarks.page';
 
 test.describe('Create Bookmark', () => {
+  test.beforeEach(async ({ page }) => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    await page.request.delete(`${apiUrl}/bookmarks`);
+  });
+
   test('should create a bookmark and show success message', async ({ page }) => {
-    const bookmarkPage = new BookmarkCreatePage(page);
+    const bookmarkPage = new BookmarksPage(page);
     
     await bookmarkPage.goto();
 
-    const bookmark = {
+    await bookmarkPage.createBookmark({
       title: 'Example Bookmark',
-      url: 'https://example.com',
       tags: 'web,development'
-    };
-
-    await bookmarkPage.createBookmark(bookmark);
+    });
 
     await expect(bookmarkPage.successMessage).toBeVisible();
     await expect(bookmarkPage.successMessage).toContainText('Bookmark created successfully');

@@ -13,6 +13,7 @@ interface BookmarkListProps {
   onTagFilterChange: (value: string) => void;
   onSearchChange: (value: string) => void;
   onFilterKeyDown: () => void;
+  onDelete: (id: string) => void;
 }
 
 export default function BookmarkList({
@@ -21,11 +22,12 @@ export default function BookmarkList({
   searchQuery,
   onTagFilterChange,
   onSearchChange,
-  onFilterKeyDown
+  onFilterKeyDown,
+  onDelete
 }: BookmarkListProps) {
   return (
-    <section style={{ marginTop: '2rem' }}>
-      <h2>Bookmarks</h2>
+    <section>
+      <h2 style={{ marginBottom: '1.5rem', marginTop: 0 }}>Bookmarks</h2>
 
       <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
         <div style={{ flex: '1', minWidth: '200px' }}>
@@ -94,12 +96,32 @@ export default function BookmarkList({
                   padding: '1rem',
                   border: '1px solid #ddd',
                   borderRadius: '4px',
-                  backgroundColor: '#f9f9f9'
+                  backgroundColor: '#f9f9f9',
+                  position: 'relative'
                 }}
               >
+                <button
+                  data-testid={`bookmark-delete-${bookmark.id}`}
+                  onClick={() => onDelete(bookmark.id)}
+                  style={{
+                    position: 'absolute',
+                    top: '0.5rem',
+                    right: '0.5rem',
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    color: '#999',
+                    padding: '0.25rem 0.5rem',
+                    lineHeight: '1'
+                  }}
+                  aria-label="Delete bookmark"
+                >
+                  ×
+                </button>
                 <div
                   data-testid={`bookmark-title-${bookmark.id}`}
-                  style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem' }}
+                  style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem', paddingRight: '2rem' }}
                 >
                   {bookmark.title}
                 </div>

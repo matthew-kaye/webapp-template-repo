@@ -5,9 +5,11 @@ import {
   getFunctionalTestContext,
   waitForFunctionalTestContext
 } from './context';
+import { BookmarkStateDriver } from './utils/bookmark-state-driver';
 
 describe('Bookmarks API (functional)', () => {
   let dataSource: DataSource;
+  let stateDriver: BookmarkStateDriver;
   const baseUrl = () => getFunctionalTestContext().baseUrl;
 
   beforeAll(
@@ -19,41 +21,42 @@ describe('Bookmarks API (functional)', () => {
         context = await waitForFunctionalTestContext(5000, 50);
       }
       ({ dataSource } = context);
+      stateDriver = BookmarkStateDriver.create(dataSource);
     },
     60_000
   );
 
   beforeEach(async () => {
-    await dataSource.getRepository(BookmarkEntity).clear();
+    await stateDriver.clear();
   });
 
-  it('creates a bookmark successfully', async () => {
-    const bookmarkData = {
-      title: 'Example Bookmark',
-      url: 'https://example.com',
-      tags: 'web,development',
-    };
+  describe('POST /bookmarks/create', () => {
+    it('creates a bookmark successfully', async () => {
+      const bookmarkData = {
+        title: 'Example Bookmark',
+        url: 'https://example.com',
+        tags: 'web,development',
+      };
 
-    const response = await request(baseUrl())
-      .post('/bookmarks/create')
-      .send(bookmarkData)
-      .expect(201);
+      const response = await request(baseUrl())
+        .post('/bookmarks/create')
+        .send(bookmarkData)
+        .expect(201);
 
-    expect(response.body).toEqual({
-      id: expect.any(String),
-      title: 'Example Bookmark',
-      url: 'https://example.com',
-      tags: 'web,development',
-      created_at: expect.any(String),
+      expect(response.body).toEqual({
+        id: expect.any(String),
+        title: 'Example Bookmark',
+        url: 'https://example.com',
+        tags: 'web,development',
+        created_at: expect.any(String),
+      });
+      expect(new Date(response.body.created_at)).toBeInstanceOf(Date);
     });
-    expect(new Date(response.body.created_at)).toBeInstanceOf(Date);
   });
 
   describe('GET /bookmarks', () => {
     it('returns list of bookmarks', async () => {
-      // Create test bookmarks
-      const repo = dataSource.getRepository(BookmarkEntity);
-      await repo.save([
+      await stateDriver.createBookmarks([
         {
           title: 'Example Bookmark 1',
           url: 'https://example.com/1',
@@ -79,8 +82,7 @@ describe('Bookmarks API (functional)', () => {
     });
 
     it('filters bookmarks by tag', async () => {
-      const repo = dataSource.getRepository(BookmarkEntity);
-      await repo.save([
+      await stateDriver.createBookmarks([
         {
           title: 'Web Development',
           url: 'https://web.dev',
@@ -102,8 +104,7 @@ describe('Bookmarks API (functional)', () => {
     });
 
     it('searches bookmarks by title and URL', async () => {
-      const repo = dataSource.getRepository(BookmarkEntity);
-      await repo.save([
+      await stateDriver.createBookmarks([
         {
           title: 'React Documentation',
           url: 'https://react.dev',
@@ -116,7 +117,6 @@ describe('Bookmarks API (functional)', () => {
         }
       ]);
 
-      // Search by title
       let response = await request(baseUrl())
         .get('/bookmarks?q=React')
         .expect(200);
@@ -124,13 +124,55 @@ describe('Bookmarks API (functional)', () => {
       expect(response.body).toHaveLength(1);
       expect(response.body[0].title).toBe('React Documentation');
 
-      // Search by URL
       response = await request(baseUrl())
         .get('/bookmarks?q=vuejs')
         .expect(200);
 
       expect(response.body).toHaveLength(1);
       expect(response.body[0].title).toBe('Vue Guide');
+    });
+  });
+
+  describe('DELETE /bookmarks/:id', () => {
+    it('deletes a bookmark', async () => {
+      const saved = await stateDriver.createBookmark({
+        title: 'To Delete',
+        url: 'https://delete.com',
+        tags: 'test'
+      });
+
+      await request(baseUrl())
+        .delete(`/bookmarks/${saved.id}`)
+        .expect(200);
+
+      const repo = dataSource.getRepository(BookmarkEntity);
+      const found = await repo.findOne({ where: { id: saved.id } });
+      expect(found).toBeNull();
+    });
+  });
+
+  describe('DELETE /bookmarks', () => {
+    it('deletes all bookmarks', async () => {
+      await stateDriver.createBookmarks([
+        {
+          title: 'Bookmark 1',
+          url: 'https://example.com/1',
+          tags: 'web'
+        },
+        {
+          title: 'Bookmark 2',
+          url: 'https://example.com/2',
+          tags: 'design'
+        }
+      ]);
+
+      await request(baseUrl())
+        .delete('/bookmarks')
+        .expect(200);
+
+      const repo = dataSource.getRepository(BookmarkEntity);
+      const count = await repo.count();
+      expect(count).toBe(0);
     });
   });
 });

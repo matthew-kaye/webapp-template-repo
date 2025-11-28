@@ -15,17 +15,16 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       this.configService.get<string>('DATABASE_SYNCHRONIZE') === 'true' || isTestEnv;
 
     if (type === 'sqlite') {
-      const sqliteOptions: TypeOrmModuleOptions = {
+      return {
         type,
         database: this.configService.get<string>('DATABASE_DATABASE', ':memory:'),
         entities: [UserEntity],
         synchronize,
-        logging: false
+        logging: false,
       };
-      return sqliteOptions;
     }
 
-    const mysqlOptions: TypeOrmModuleOptions = {
+    return {
       type,
       host: this.configService.get<string>('DATABASE_HOST', 'localhost'),
       port: Number(this.configService.get<string>('DATABASE_PORT', '3306')),
@@ -34,9 +33,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       database: this.configService.get<string>('DATABASE_NAME', 'webapp'),
       entities: [UserEntity],
       synchronize,
-      logging: false
+      logging: false,
     };
-
-    return mysqlOptions;
   }
 }

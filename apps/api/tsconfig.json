@@ -8,11 +8,12 @@
     "incremental": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
       "@app/*": ["src/*"]
     }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "test/**/*.ts", "functional-tests/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

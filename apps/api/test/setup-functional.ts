@@ -5,12 +5,12 @@ import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { AppModule } from '../src/app.module';
-import { TypeOrmConfigService } from '../src/database/typeorm.config';
+import { AppModule } from '@app/app.module';
+import { TypeOrmConfigService } from '@app/database/typeorm.config';
 import {
   clearFunctionalTestContext,
   setFunctionalTestContext
-} from './functional/context';
+} from '../functional-tests/context';
 
 const PORT = Number(process.env.PORT ?? 4000);
 let startedApp: INestApplication | null = null;

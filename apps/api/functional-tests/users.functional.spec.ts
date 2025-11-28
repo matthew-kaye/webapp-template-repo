@@ -1,16 +1,28 @@
 import { randomUUID } from 'crypto';
 import { DataSource } from 'typeorm';
 import request from 'supertest';
-import { UserEntity } from '../../src/users/infrastructure/typeorm/user.entity';
-import { getFunctionalTestContext } from './context';
+import { UserEntity } from '@app/users/infrastructure/typeorm/user.entity';
+import {
+  getFunctionalTestContext,
+  waitForFunctionalTestContext
+} from './context';
 
 describe('GET /users/:id (functional)', () => {
   let dataSource: DataSource;
   const baseUrl = () => getFunctionalTestContext().baseUrl;
 
-  beforeAll(() => {
-    ({ dataSource } = getFunctionalTestContext());
-  });
+  beforeAll(
+    async () => {
+      let context;
+      try {
+        context = getFunctionalTestContext();
+      } catch {
+        context = await waitForFunctionalTestContext(5000, 50);
+      }
+      ({ dataSource } = context);
+    },
+    60_000
+  );
 
   beforeEach(async () => {
     await dataSource.getRepository(UserEntity).clear();

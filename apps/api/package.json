@@ -10,8 +10,8 @@
     "start": "node dist/main.js",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "format": "prettier --write .",
-    "test:unit": "TEST_TYPE=unit jest --config jest.config.ts --testPathPattern=.unit.",
-    "test:functional": "TEST_TYPE=functional jest --config jest.config.ts --testPathPattern=.functional."
+    "test:unit": "jest",
+    "test:functional": "jest --config functional-tests/jest.config.ts"
   },
   "keywords": [],
   "author": "",

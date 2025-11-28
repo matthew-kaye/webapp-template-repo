@@ -1,22 +1,12 @@
 import type { Config } from 'jest';
+import { baseConfig } from './jest.config.base';
 
-const setupFilesAfterEnv = ['<rootDir>/test/setup.ts'];
 const config: Config = {
-  rootDir: '.',
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  moduleFileExtensions: ['ts', 'js', 'json'],
+  ...baseConfig,
   testMatch: ['**/?(*.)+(spec|test).ts'],
-  setupFilesAfterEnv,
-  moduleNameMapper: {
-    '^@app/(.*)$': '<rootDir>/src/$1'
-  },
-  collectCoverageFrom: ['src/**/*.ts', '!src/main.ts']
+  testPathIgnorePatterns: ['functional-tests'],
+  setupFilesAfterEnv: ['<rootDir>/test/setup.ts']
 };
 
-if (process.env.TEST_TYPE === 'functional') {
-  setupFilesAfterEnv.push('<rootDir>/test/setup-functional.ts');
-  config.testTimeout = 60_000;
-}
-
 export default config;
+

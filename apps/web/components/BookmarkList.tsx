@@ -14,6 +14,7 @@ interface BookmarkListProps {
   onSearchChange: (value: string) => void;
   onFilterKeyDown: () => void;
   onDelete: (id: string) => void;
+  onEdit: (bookmark: Bookmark) => void;
 }
 
 export default function BookmarkList({
@@ -23,7 +24,8 @@ export default function BookmarkList({
   onTagFilterChange,
   onSearchChange,
   onFilterKeyDown,
-  onDelete
+  onDelete,
+  onEdit
 }: BookmarkListProps) {
   return (
     <section>
@@ -83,10 +85,10 @@ export default function BookmarkList({
         </div>
       </div>
 
-      <div data-testid="bookmark-list">
-        {bookmarks.length === 0 ? (
-          <p style={{ color: '#666', fontStyle: 'italic' }}>No bookmarks found</p>
-        ) : (
+            <div data-testid="bookmark-list">
+              {!bookmarks || bookmarks.length === 0 ? (
+                <p style={{ color: '#666', fontStyle: 'italic' }}>No bookmarks found</p>
+              ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {bookmarks.map((bookmark) => (
               <div
@@ -96,34 +98,63 @@ export default function BookmarkList({
                   padding: '1rem',
                   border: '1px solid #ddd',
                   borderRadius: '4px',
-                  backgroundColor: '#f9f9f9',
-                  position: 'relative'
+                  backgroundColor: '#f9f9f9'
                 }}
               >
-                <button
-                  data-testid={`bookmark-delete-${bookmark.id}`}
-                  onClick={() => onDelete(bookmark.id)}
-                  style={{
-                    position: 'absolute',
-                    top: '0.5rem',
-                    right: '0.5rem',
-                    background: 'none',
-                    border: 'none',
-                    fontSize: '1.5rem',
-                    cursor: 'pointer',
-                    color: '#999',
-                    padding: '0.25rem 0.5rem',
-                    lineHeight: '1'
-                  }}
-                  aria-label="Delete bookmark"
-                >
-                  ×
-                </button>
                 <div
-                  data-testid={`bookmark-title-${bookmark.id}`}
-                  style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem', paddingRight: '2rem' }}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '0.5rem'
+                  }}
                 >
-                  {bookmark.title}
+                  <div
+                    data-testid={`bookmark-title-${bookmark.id}`}
+                    style={{ fontSize: '1.1rem', fontWeight: 'bold', flex: 1 }}
+                  >
+                    {bookmark.title}
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '0.5rem',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <button
+                      data-testid={`bookmark-edit-${bookmark.id}`}
+                      onClick={() => onEdit(bookmark)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '1rem',
+                        cursor: 'pointer',
+                        color: '#0066cc',
+                        padding: '0.25rem 0.5rem',
+                        lineHeight: '1'
+                      }}
+                      aria-label="Edit bookmark"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      data-testid={`bookmark-delete-${bookmark.id}`}
+                      onClick={() => onDelete(bookmark.id)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '1.5rem',
+                        cursor: 'pointer',
+                        color: '#999',
+                        padding: '0.25rem 0.5rem',
+                        lineHeight: '1'
+                      }}
+                      aria-label="Delete bookmark"
+                    >
+                      ×
+                    </button>
+                  </div>
                 </div>
                 <div
                   data-testid={`bookmark-url-${bookmark.id}`}

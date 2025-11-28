@@ -27,6 +27,21 @@ export class BookmarksRepository implements BookmarksRepositoryPort {
     };
   }
 
+  async update(id: string, bookmark: Omit<Bookmark, 'id' | 'created_at'>): Promise<Bookmark> {
+    await this.repository.update(id, bookmark);
+    const updated = await this.repository.findOne({ where: { id } });
+    if (!updated) {
+      throw new Error(`Bookmark with id ${id} not found`);
+    }
+    return {
+      id: updated.id,
+      title: updated.title,
+      url: updated.url,
+      tags: updated.tags,
+      created_at: updated.created_at
+    };
+  }
+
   async list(tag?: string, query?: string): Promise<Bookmark[]> {
     const queryBuilder = this.repository.createQueryBuilder('bookmark');
 

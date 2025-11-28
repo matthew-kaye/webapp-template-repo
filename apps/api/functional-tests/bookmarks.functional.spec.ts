@@ -9,7 +9,7 @@ import { BookmarkStateDriver } from './utils/bookmark-state-driver';
 
 describe('Bookmarks API (functional)', () => {
   let dataSource: DataSource;
-  let stateDriver: BookmarkStateDriver;
+  let bookmarkStateDriver: BookmarkStateDriver;
   const baseUrl = () => getFunctionalTestContext().baseUrl;
 
   beforeAll(
@@ -21,13 +21,13 @@ describe('Bookmarks API (functional)', () => {
         context = await waitForFunctionalTestContext(5000, 50);
       }
       ({ dataSource } = context);
-      stateDriver = BookmarkStateDriver.create(dataSource);
+      bookmarkStateDriver = BookmarkStateDriver.create(dataSource);
     },
     60_000
   );
 
   beforeEach(async () => {
-    await stateDriver.clear();
+    await bookmarkStateDriver.clear();
   });
 
   describe('POST /bookmarks/create', () => {
@@ -54,9 +54,43 @@ describe('Bookmarks API (functional)', () => {
     });
   });
 
+  describe('PUT /bookmarks/:id', () => {
+    it('updates a bookmark successfully', async () => {
+      const saved = await bookmarkStateDriver.createBookmark({
+        title: 'Original Title',
+        url: 'https://original.com',
+        tags: 'original'
+      });
+
+      const updateData = {
+        title: 'Updated Title',
+        url: 'https://updated.com',
+        tags: 'updated'
+      };
+
+      const response = await request(baseUrl())
+        .put(`/bookmarks/${saved.id}`)
+        .send(updateData)
+        .expect(200);
+
+      expect(response.body).toEqual({
+        id: saved.id,
+        title: 'Updated Title',
+        url: 'https://updated.com',
+        tags: 'updated',
+        created_at: expect.any(String)
+      });
+
+      const found = await bookmarkStateDriver.findBookmarkById(saved.id);
+      expect(found?.title).toBe('Updated Title');
+      expect(found?.url).toBe('https://updated.com');
+      expect(found?.tags).toBe('updated');
+    });
+  });
+
   describe('GET /bookmarks', () => {
     it('returns list of bookmarks', async () => {
-      await stateDriver.createBookmarks([
+      await bookmarkStateDriver.createBookmarks([
         {
           title: 'Example Bookmark 1',
           url: 'https://example.com/1',
@@ -82,7 +116,7 @@ describe('Bookmarks API (functional)', () => {
     });
 
     it('filters bookmarks by tag', async () => {
-      await stateDriver.createBookmarks([
+      await bookmarkStateDriver.createBookmarks([
         {
           title: 'Web Development',
           url: 'https://web.dev',
@@ -104,7 +138,7 @@ describe('Bookmarks API (functional)', () => {
     });
 
     it('searches bookmarks by title and URL', async () => {
-      await stateDriver.createBookmarks([
+      await bookmarkStateDriver.createBookmarks([
         {
           title: 'React Documentation',
           url: 'https://react.dev',
@@ -135,7 +169,7 @@ describe('Bookmarks API (functional)', () => {
 
   describe('DELETE /bookmarks/:id', () => {
     it('deletes a bookmark', async () => {
-      const saved = await stateDriver.createBookmark({
+      const saved = await bookmarkStateDriver.createBookmark({
         title: 'To Delete',
         url: 'https://delete.com',
         tags: 'test'
@@ -153,7 +187,7 @@ describe('Bookmarks API (functional)', () => {
 
   describe('DELETE /bookmarks', () => {
     it('deletes all bookmarks', async () => {
-      await stateDriver.createBookmarks([
+      await bookmarkStateDriver.createBookmarks([
         {
           title: 'Bookmark 1',
           url: 'https://example.com/1',

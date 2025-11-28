@@ -13,6 +13,10 @@ export class BookmarksService {
     return this.bookmarksRepository.create(bookmark);
   }
 
+  async updateBookmark(id: string, bookmark: Omit<Bookmark, 'id' | 'created_at'>): Promise<Bookmark> {
+    return this.bookmarksRepository.update(id, bookmark);
+  }
+
   async listBookmarks(tag?: string, query?: string): Promise<Bookmark[]> {
     return this.bookmarksRepository.list(tag, query);
   }

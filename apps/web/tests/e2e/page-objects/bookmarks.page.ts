@@ -90,4 +90,26 @@ export class BookmarksPage {
     await deleteButton.click();
     await expect(bookmarkItem).not.toBeVisible();
   }
+
+  async editBookmarkWithTitle(title: string): Promise<void> {
+    const bookmarkItem = this.page.locator(
+      `[data-testid^="bookmark-item-"]:has([data-testid^="bookmark-title-"]:has-text("${title}"))`,
+    );
+    const editButton = bookmarkItem.locator('[data-testid^="bookmark-edit-"]');
+    await expect(editButton).toBeVisible();
+    await editButton.click();
+    await expect(this.page.getByTestId('bookmark-update-modal')).toBeVisible();
+  }
+
+  async updateBookmark(bookmark: { title: string; url?: string; tags?: string }): Promise<void> {
+    const titleInput = this.page.getByTestId('bookmark-update-title-input');
+    const urlInput = this.page.getByTestId('bookmark-update-url-input');
+    const tagsInput = this.page.getByTestId('bookmark-update-tags-input');
+    const submitButton = this.page.getByTestId('bookmark-update-submit-button');
+
+    await titleInput.fill(bookmark.title);
+    await urlInput.fill(bookmark.url || 'https://example.com');
+    await tagsInput.fill(bookmark.tags || 'test');
+    await submitButton.click();
+  }
 }

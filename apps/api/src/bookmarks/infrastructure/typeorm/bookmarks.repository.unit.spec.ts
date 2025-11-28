@@ -47,6 +47,33 @@ describe('BookmarksRepository', () => {
     expect(saved?.tags).toBe('web,development');
   });
 
+  describe('update', () => {
+    it('updates a bookmark by id', async () => {
+      const repo = dataSource.getRepository(BookmarkEntity);
+      const saved = await repo.save({
+        title: 'Original Title',
+        url: 'https://original.com',
+        tags: 'original'
+      });
+
+      const updated = await repository.update(saved.id, {
+        title: 'Updated Title',
+        url: 'https://updated.com',
+        tags: 'updated'
+      });
+
+      expect(updated.id).toBe(saved.id);
+      expect(updated.title).toBe('Updated Title');
+      expect(updated.url).toBe('https://updated.com');
+      expect(updated.tags).toBe('updated');
+
+      const found = await repo.findOne({ where: { id: saved.id } });
+      expect(found?.title).toBe('Updated Title');
+      expect(found?.url).toBe('https://updated.com');
+      expect(found?.tags).toBe('updated');
+    });
+  });
+
   describe('list', () => {
     it('returns all bookmarks', async () => {
       const repo = dataSource.getRepository(BookmarkEntity);

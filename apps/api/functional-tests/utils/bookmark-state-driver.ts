@@ -26,6 +26,11 @@ export class BookmarkStateDriver {
     return repo.save(bookmarks);
   }
 
+  async findBookmarkById(id: string): Promise<BookmarkEntity | null> {
+    const repo = this.dataSource.getRepository(BookmarkEntity);
+    return repo.findOne({ where: { id } });
+  }
+
   async clear(): Promise<void> {
     await this.dataSource.getRepository(BookmarkEntity).clear();
   }

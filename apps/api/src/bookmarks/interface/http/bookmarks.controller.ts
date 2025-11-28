@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { BookmarksService } from '../../application/bookmarks.service';
 import { Bookmark } from '../../domain/bookmark';
 
@@ -12,6 +12,21 @@ export class BookmarksController {
   @Post('create')
   async createBookmark(@Body() body: CreateBookmarkRequest): Promise<CreateBookmarkResponse> {
     const bookmark = await this.bookmarksService.createBookmark(body);
+    return {
+      id: bookmark.id,
+      title: bookmark.title,
+      url: bookmark.url,
+      tags: bookmark.tags,
+      created_at: bookmark.created_at
+    };
+  }
+
+  @Put(':id')
+  async updateBookmark(
+    @Param('id') id: string,
+    @Body() body: CreateBookmarkRequest
+  ): Promise<CreateBookmarkResponse> {
+    const bookmark = await this.bookmarksService.updateBookmark(id, body);
     return {
       id: bookmark.id,
       title: bookmark.title,

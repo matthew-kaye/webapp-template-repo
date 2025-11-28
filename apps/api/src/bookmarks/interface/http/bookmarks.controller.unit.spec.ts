@@ -34,6 +34,36 @@ describe('BookmarksController', () => {
     });
   });
 
+  describe('update', () => {
+    it('updates a bookmark and returns the updated bookmark', async () => {
+      const service = mock<BookmarksService>();
+      const bookmarkData = {
+        title: 'Updated Bookmark',
+        url: 'https://updated.com',
+        tags: 'updated'
+      };
+      const updatedBookmark = {
+        id: 'bookmark-1',
+        ...bookmarkData,
+        created_at: new Date('2024-01-15T10:30:00Z')
+      };
+
+      service.updateBookmark.mockResolvedValue(updatedBookmark);
+      const controller = new BookmarksController(service);
+
+      const response = await controller.updateBookmark('bookmark-1', bookmarkData);
+
+      expect(response).toEqual({
+        id: 'bookmark-1',
+        title: 'Updated Bookmark',
+        url: 'https://updated.com',
+        tags: 'updated',
+        created_at: new Date('2024-01-15T10:30:00Z')
+      });
+      expect(service.updateBookmark).toHaveBeenCalledWith('bookmark-1', bookmarkData);
+    });
+  });
+
   describe('list', () => {
     it('returns list of bookmarks', async () => {
       const service = mock<BookmarksService>();

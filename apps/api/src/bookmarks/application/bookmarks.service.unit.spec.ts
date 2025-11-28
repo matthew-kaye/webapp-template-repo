@@ -28,6 +28,30 @@ describe('BookmarksService', () => {
     });
   });
 
+  describe('update', () => {
+    it('updates a bookmark using the repository', async () => {
+      const repository = mock<BookmarksRepositoryPort>();
+      const service = new BookmarksService(repository);
+      const bookmarkData: Omit<Bookmark, 'id' | 'created_at'> = {
+        title: 'Updated Bookmark',
+        url: 'https://updated.com',
+        tags: 'updated'
+      };
+      const updatedBookmark: Bookmark = {
+        id: 'bookmark-1',
+        ...bookmarkData,
+        created_at: new Date('2024-01-15T10:30:00Z')
+      };
+
+      repository.update.mockResolvedValue(updatedBookmark);
+
+      const result = await service.updateBookmark('bookmark-1', bookmarkData);
+
+      expect(result).toEqual(updatedBookmark);
+      expect(repository.update).toHaveBeenCalledWith('bookmark-1', bookmarkData);
+    });
+  });
+
   describe('list', () => {
     it('returns list of bookmarks from repository', async () => {
       const repository = mock<BookmarksRepositoryPort>();
